@@ -182,15 +182,15 @@ def web_preview(url, timeout=None, headers=None, requests_kwargs=DEFAULT_REQUEST
     """
     Extract title, description and image from OpenGraph or TwitterCard or Schema or GenericPreview. Which ever returns first.
     """
-    og = OpenGraph(url, ['og:title', 'og:description', 'og:image'], timeout=timeout, headers=headers, requests_kwargs=requests_kwargs))
+    og = OpenGraph(url, ['og:title', 'og:description', 'og:image'], timeout=timeout, headers=headers, requests_kwargs=requests_kwargs)
     if og.title:
         return og.title, og.description, og.image
 
-    tc = TwitterCard(url, ['twitter:title', 'twitter:description', 'twitter:image'], timeout=timeout, headers=headers, requests_kwargs=requests_kwargs))
+    tc = TwitterCard(url, ['twitter:title', 'twitter:description', 'twitter:image'], timeout=timeout, headers=headers, requests_kwargs=requests_kwargs)
     if tc.title:
         return tc.title, tc.description, tc.image
 
-    s = Schema(url, ['name', 'description', 'image'], timeout=timeout, headers=headers, requests_kwargs=requests_kwargs))
+    s = Schema(url, ['name', 'description', 'image'], timeout=timeout, headers=headers, requests_kwargs=requests_kwargs)
     if s.name:
         return s.name, s.description, s.image
 
