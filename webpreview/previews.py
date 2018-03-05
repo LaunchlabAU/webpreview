@@ -6,12 +6,14 @@ from bs4 import BeautifulSoup
 
 from .excepts import *
 
+DEFAULT_REQUESTS_KWARGS = {}
+
 
 class PreviewBase(object):
     """
     Base for all web preview.
     """
-    def __init__(self, url = None, properties = None, timeout=None, headers=None):
+    def __init__(self, url = None, properties = None, timeout=None, headers=None, requests_kwargs=DEFAULT_REQUESTS_KWARGS):
         # if no first argument raise URL required exception
         if not url:
             raise EmptyURL("Please pass a valid URL as the first argument.")
@@ -30,7 +32,7 @@ class PreviewBase(object):
 
         # if no schema add http as default
         try:
-            res = requests.get(url, timeout=timeout, headers=headers)
+            res = requests.get(url, timeout=timeout, headers=headers, **requests_kwargs)
         except (ConnectionError, HTTPError, Timeout, TooManyRedirects):
             raise URLUnreachable("The URL does not exists.")
         except MissingSchema: # if no schema add http as default
@@ -38,7 +40,7 @@ class PreviewBase(object):
 
         # throw URLUnreachable exception for just incase
         try:
-            res = requests.get(url, timeout=timeout, headers=headers)
+            res = requests.get(url, timeout=timeout, headers=headers, **requests_kwargs)
         except (ConnectionError, HTTPError, Timeout, TooManyRedirects):
             raise URLUnreachable("The URL is unreachable.")
 
@@ -60,8 +62,8 @@ class GenericPreview(PreviewBase):
     """
     Extracts title, description, image from a webpage's body instead of the meta tags.
     """
-    def __init__(self, url = None, properties = ['title', 'description', 'image'], timeout=None, headers=None):
-        super(GenericPreview, self).__init__(url, properties, timeout=timeout, headers=headers)
+    def __init__(self, url = None, properties = ['title', 'description', 'image'], timeout=None, headers=None, requests_kwargs=DEFAULT_REQUESTS_KWARGS):
+        super(GenericPreview, self).__init__(url, properties, timeout=timeout, headers=headers, requests_kwargs=requests_kwargs)
         self.title = self._get_title()
         self.description = self._get_description()
         self.image = self._get_image()
@@ -176,7 +178,7 @@ class Schema(SocialPreviewBase):
         super(Schema, self).__init__(*args, **kwargs)
 
 
-def web_preview(url, timeout=None, headers=None):
+def web_preview(url, timeout=None, headers=None, requests_kwargs=DEFAULT_REQUESTS_KWARGS):
     """
     Extract title, description and image from OpenGraph or TwitterCard or Schema or GenericPreview. Which ever returns first.
     """
@@ -192,5 +194,5 @@ def web_preview(url, timeout=None, headers=None):
     if s.name:
         return s.name, s.description, s.image
 
-    gp = GenericPreview(url, timeout=timeout, headers=headers)
+    gp = GenericPreview(url, timeout=timeout, headers=headers, requests_kwargs=requests_kwargs)
     return gp.title, gp.description, gp.image
