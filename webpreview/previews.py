@@ -89,7 +89,7 @@ class GenericPreview(PreviewBase):
         soup = self._soup
         # extract content preview from meta[name='description']
         meta_description = soup.find('meta',attrs = {"name" : "description"})
-        if(meta_description and meta_description['content'] !=""):
+        if(meta_description and meta_description.get('content', '') !=""):
             return meta_description['content']
         # else extract preview from the first <p> sibling to the first <h1>
         first_h1 = soup.find('h1')
@@ -144,7 +144,7 @@ class SocialPreviewBase(PreviewBase):
             else:
                 new_property = property
 
-            if property_meta and property_meta['content'] != "":
+            if property_meta and property_meta.get('content', '') != "":
                 # dynamically attach property to instance
                 self.__dict__[new_property] = property_meta['content']
             else:
